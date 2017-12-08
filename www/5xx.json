@@ -1,0 +1,4 @@
+{
+  "message": "Some 5xx error",
+  "status": "5xx"
+}
