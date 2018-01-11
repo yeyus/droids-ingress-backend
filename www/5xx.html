@@ -2,7 +2,7 @@
 <html lang=en>
   <head>
     <meta charset=utf-8>
-    <title>Internal Server Error - It's a trap</title>
+    <title>{{.StatusText}} - It's a trap</title>
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <style>
      body {
@@ -13,8 +13,9 @@
     </style>
   </head>
   <body>
-    <img src="ackbar.png" alt="It's a trap"/>
-    <h1>5xx - Internal Server Error</h1>
+    <img src="static/ackbar.png" alt="It's a trap"/>
+    <h1>{{.Status}} - {{.StatusText}}</h1>
     <p>It's a trap</p>
+    <pre>Original URI: {{.OriginalURI}}</pre>
   </body>
 </html>
