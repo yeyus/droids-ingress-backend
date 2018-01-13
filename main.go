@@ -32,13 +32,25 @@ func main() {
 
 	fs := http.FileServer(http.Dir(fmt.Sprintf("%swww/static", base)))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.Handle("/", http.HandlerFunc(codeHandler))
+	http.Handle("/healthz", http.HandlerFunc(Health))
+	http.Handle("/", http.HandlerFunc(CodeHandler))
 
 	log.Printf("Listening to port %s...", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	http.ListenAndServe(fmt.Sprintf(":%s", port), logRequest(http.DefaultServeMux))
 }
 
-func codeHandler(w http.ResponseWriter, r *http.Request) {
+func logRequest(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
+}
+
+func Health(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "ok")
+}
+
+func CodeHandler(w http.ResponseWriter, r *http.Request) {
 	numCode, _ := strconv.ParseInt(r.Header.Get(CODE_HEADER), 10, 32)
 	td := ErrorTemplateData{
 		Status:      r.Header.Get(CODE_HEADER),
@@ -54,6 +66,10 @@ func codeHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error while accessing template: %s", templatePath)
 	}
 
+	if numCode == 0 {
+		numCode = 404
+	}
+	w.WriteHeader(int(numCode))
 	tmpl.Execute(w, td)
 }
 
