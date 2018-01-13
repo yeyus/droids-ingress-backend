@@ -28,7 +28,9 @@ func main() {
 		port = DEFAULT_PORT
 	}
 
-	fs := http.FileServer(http.Dir("www/static"))
+	base := os.Getenv("HTTP_BASE_DIR")
+
+	fs := http.FileServer(http.Dir(fmt.Sprintf("%swww/static", base)))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.Handle("/", http.HandlerFunc(codeHandler))
 
@@ -75,8 +77,9 @@ func GetTemplateFile(code string, format string) string {
 		format = "html"
 	}
 
+	base := os.Getenv("HTTP_BASE_DIR")
 	c := []byte(code)
-	filePath := fmt.Sprintf("www/%s.%s", code, format)
+	filePath := fmt.Sprintf("%swww/%s.%s", base, code, format)
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		for i := (len(c) - 1); i >= 0; i-- {
 			if i == (len(c)-1) && c[i] != 'x' || c[i] != 'x' {

@@ -1,8 +1,12 @@
-FROM aledbf/nginx-error-server:0.6
-MAINTAINER elyeyus@gmail.com
+FROM golang
 
-ADD ./www /var/www/html
+ADD . /go/src/github.com/yeyus/droids-ingress-backend
 
-EXPOSE 80 443
+RUN go install github.com/yeyus/droids-ingress-backend
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT /go/bin/droids-ingress-backend
+
+ENV HTTP_SERVE_PORT 80
+ENV HTTP_BASE_DIR /go/src/github.com/yeyus/droids-ingress-backend/
+
+EXPOSE 80
